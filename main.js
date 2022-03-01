@@ -117,8 +117,8 @@ fetch("dataof2016Demo.json")
                 .attr("cy", y(selectedData.mean_estimation))
               focusText
                 .html("Time:" + new Date(selectedData.timestamp).toLocaleString() + "  -  " + "Value:" + selectedData.mean_estimation.toFixed(2))
-                .attr("x", x(selectedData.timestamp)+15)
-                .attr("y", y(selectedData.mean_estimation-0.091))
+                .attr("x", x(xMin))
+                .attr("y", y(yMax-0.05))
               }
             function mouseout() {
               focus.style("opacity", 0);
