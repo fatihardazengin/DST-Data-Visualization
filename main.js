@@ -116,7 +116,7 @@ fetch("dataof2016Demo.json")
                 .attr("cx", x(selectedData.timestamp))
                 .attr("cy", y(selectedData.mean_estimation))
               focusText
-                .html("Time:" + new Date(selectedData.timestamp).toLocaleString() + "  -  " + "Value:" + selectedData.mean_estimation)
+                .html("Time:" + new Date(selectedData.timestamp).toLocaleString() + "  -  " + "Value:" + selectedData.mean_estimation.toFixed(2))
                 .attr("x", x(selectedData.timestamp)+15)
                 .attr("y", y(selectedData.mean_estimation+0.051))
               }
