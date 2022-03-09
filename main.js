@@ -7,7 +7,7 @@
 
 // set the dimensions and margins of the graph
 var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = window.innerWidth - margin.left - margin.right - 350 
+    width = window.innerWidth - margin.left - margin.right -350
     height = 400 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
@@ -15,6 +15,7 @@ var svg = d3.select("#my_dataviz")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+    
     .append("g")
     .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
@@ -22,7 +23,7 @@ var svg = d3.select("#my_dataviz")
   
 
 //
-fetch("dataof2016Demo.json") // fetching the data file.
+fetch("daily_sentiment.json") // fetching the data file.
         .then(response => response.text())
         .then((response) => {
             //console.log(response)
@@ -31,7 +32,7 @@ fetch("dataof2016Demo.json") // fetching the data file.
             //console.log(data)
             data=data.map(e=>JSON.parse(e))
             data=data.map(e=>{
-              delete e.bootstrapped_means;
+              //delete e.bootstrapped_means;
               e.timestamp=e.timestamp*1000;
               return e;
               
@@ -39,8 +40,8 @@ fetch("dataof2016Demo.json") // fetching the data file.
             // find data range
             var xMin = d3.min(data, function(d){ return Math.min(d.timestamp); });
             var xMax = d3.max(data, function(d){ return Math.max(d.timestamp); });
-            var yMin = d3.min(data, function(d){ return Math.min(d.mean_estimation); });
-            var yMax = d3.max(data, function(d){ return Math.max(d.mean_estimation); });
+            var yMin = d3.min(data, function(d){ return Math.min(d.senti_avg); });
+            var yMax = d3.max(data, function(d){ return Math.max(d.senti_avg); });
           //console.log(data);
             var x = d3.scaleTime()
               .domain([xMin,xMax])
@@ -53,6 +54,25 @@ fetch("dataof2016Demo.json") // fetching the data file.
             var y = d3.scaleLinear()
               .domain([yMin,yMax])
               .range([ height, 0 ]);
+    
+    
+    
+            
+    
+    
+    
+    
+            // Show confidence interval
+            svg.append("path")
+                .datum(data)
+                .attr("fill", "#cce5df")
+                .attr("stroke", "none")
+                .attr("d", d3.area()
+                    .x(function(d) { return x(d.timestamp) })
+                    .y0(function(d) { return y(d.senti_avg+d.senti_sd) })
+                    .y1(function(d) { return y((d.senti_avg-d.senti_sd)) })
+                    )
+           
            
                // This allows to find the closest X index of the mouse:
             var bisect = d3.bisector(function(d) { return d.timestamp; }).left;
@@ -85,7 +105,7 @@ fetch("dataof2016Demo.json") // fetching the data file.
               .attr("stroke-width", 1.5)
               .attr("d", d3.line()
                 .x(function(d) { return x(d.timestamp) }) 
-                .y(function(d) { return y(d.mean_estimation) })
+                .y(function(d) { return y(d.senti_avg) })
                 )
           // Create a rect on top of the svg area: this rectangle recovers mouse position
             svg
@@ -112,9 +132,9 @@ fetch("dataof2016Demo.json") // fetching the data file.
               selectedData = data[i]
               focus
                 .attr("cx", x(selectedData.timestamp))
-                .attr("cy", y(selectedData.mean_estimation))
+                .attr("cy", y(selectedData.senti_avg))
               focusText
-                .html("Time:" + new Date(selectedData.timestamp).toLocaleString() + "  -  " + "Value:" + selectedData.mean_estimation.toFixed(2))
+                .html("Time:" + new Date(selectedData.timestamp).toLocaleString() + "  -  " + "Sentiment Average :" + selectedData.senti_avg.toFixed(2) )
                 .attr("x", x(xMin))
                 .attr("y", y(yMax-0.05))
               }
