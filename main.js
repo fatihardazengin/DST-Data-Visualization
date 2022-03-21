@@ -3,26 +3,11 @@
 /*global selectedData*/
 /*global fetch*/
 
+var parseDate = d3.timeParse("%Y-%m-%d");
 
 
-// set the dimensions and margins of the graph
-var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = window.innerWidth - margin.left - margin.right -((window.innerWidth/100)*15)
-    height = 400 - margin.top - margin.bottom;
+//Reading the data.
 
-// append the svg object to the body of the page
-var svg = d3.select("#my_dataviz")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    
-    .append("g")
-    .attr("transform",
-        "translate(" + margin.left + "," + margin.top + ")");
-  
-  
-
-//
 fetch("daily_sentiment.json") // fetching the data file.
         .then(response => response.text())
         .then((response) => {
@@ -37,111 +22,174 @@ fetch("daily_sentiment.json") // fetching the data file.
               return e;
               
             })
-            // find data range
-            var xMin = d3.min(data, function(d){ return Math.min(d.timestamp); });
-            var xMax = d3.max(data, function(d){ return Math.max(d.timestamp); });
-            var yMin = d3.min(data, function(d){ return Math.min(d.senti_avg); });
-            var yMax = d3.max(data, function(d){ return Math.max(d.senti_avg); });
-          //console.log(data);
-            var x = d3.scaleTime()
-              .domain([xMin,xMax])
-              .range([ 0, width ]);
-            svg.append("g")
-              .attr("transform", "translate(0," + height + ")")
-              .call(d3.axisBottom(x));
-          
-            // Add Y axis
-            var y = d3.scaleLinear()
-              .domain([yMin,yMax])
-              .range([ height, 0 ]);
-    
-    
-    
-            
-    
-    
-    
-    
-            // Show confidence interval
-            svg.append("path")
-                .datum(data)
-                .attr("fill", "#cce5df")
-                .attr("stroke", "none")
-                .attr("d", d3.area()
-                    .x(function(d) { return x(d.timestamp) })
-                    .y0(function(d) { return y(d.senti_avg+d.senti_sd) })
-                    .y1(function(d) { return y((d.senti_avg-d.senti_sd)) })
-                    )
-           
-           
-               // This allows to find the closest X index of the mouse:
-            var bisect = d3.bisector(function(d) { return d.timestamp; }).left;
-          
-            // Create the circle that travels along the curve of chart
-            var focus = svg
-              .append('g')
-              .append('circle')
-                .style("fill", "none")
-                .attr("stroke", "black")
-                .attr('r', 8.5)
-                .style("opacity", 0)
-          
-            // Create the text that travels along the curve of chart
-            var focusText = svg
-              .append('g')
-              .append('text')
-                .style("opacity", 0)
-                .attr("text-anchor", "left")
-                .attr("alignment-baseline", "middle")
+    // set the dimensions and margins of the graph
+    var margin = {top: 10, right: 30, bottom: 30, left: 60},
+        width = window.innerWidth - margin.left - margin.right -((window.innerWidth/100)*17)
+        height = 400 - margin.top - margin.bottom;
 
-              
-            svg.append("g")
-              .call(d3.axisLeft(y));
-            svg
-              .append("path")
-              .datum(data)
-              .attr("fill", "none")
-              .attr("stroke", "steelblue")
-              .attr("stroke-width", 1.5)
-              .attr("d", d3.line()
-                .x(function(d) { return x(d.timestamp) }) 
-                .y(function(d) { return y(d.senti_avg) })
-                )
-          // Create a rect on top of the svg area: this rectangle recovers mouse position
-            svg
-              .append('rect')
-              .style("fill", "none")
-              .style("pointer-events", "all")
-              .attr('width', width)
-              .attr('height', height)
-              .on('mouseover', mouseover)
-              .on('mousemove', mousemove)
-              .on('mouseout', mouseout);
-          
-          
-            // What happens when the mouse move -> show the annotations at the right positions.
-            function mouseover() {
-              focus.style("opacity", 1)
-              focusText.style("opacity",1)
-            }
-          
-            function mousemove() {
-              // recover coordinate we need
-              var x0 = x.invert(d3.mouse(this)[0]);
-              var i = bisect(data, x0, 1);
-              selectedData = data[i]
-              focus
-                .attr("cx", x(selectedData.timestamp))
-                .attr("cy", y(selectedData.senti_avg))
-              focusText
-                .html("Time:" + new Date(selectedData.timestamp).toLocaleString() + "  -  " + "Sentiment Average :" + selectedData.senti_avg.toFixed(2) )
-                .attr("x", x(xMin))
-                .attr("y", y(yMax-0.05))
-              }
-            function mouseout() {
-              focus.style("opacity", 0);
-              focusText.style("opacity", 0);
-            }
+    // find data range
+    var xMin = d3.min(data, function(d){ return Math.min(d.timestamp); });
+    var xMax = d3.max(data, function(d){ return Math.max(d.timestamp); });
+    var yMin = d3.min(data, function(d){ return Math.min(d.senti_avg); });
+    var yMax = d3.max(data, function(d){ return Math.max(d.senti_avg); });
+    
+	var svg = d3.select("#chart")
+		margin = margin,
+		width = +svg.attr("width") - margin.left - margin.right,
+		height = +svg.attr("height") - margin.top - margin.bottom;
+
+	var x = d3.scaleTime()
+		.domain([xMin,xMax])
+		.range([margin.left, width - margin.right])
+
+	var y = d3.scaleLinear()
+		.domain([yMin,yMax+0.2]).nice()
+		.range([height - margin.bottom, margin.top])
+
+	var xAxis = svg.append("g")
+		.attr("class", "x-axis")
+		.attr("clip-path", "url(#clip)")
+		.attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x));
+
+	var yAxis = svg.append("g")
+		.attr("class", "y-axis")
+		.attr("transform", `translate(${margin.left},0)`)
+		.call(d3.axisLeft(y));
+
+	var line = d3.line()
+		.defined(d => !isNaN(d.senti_avg))
+		.x(d => x(d.timestamp))
+		.y(d => y(d.senti_avg))
+
+	var defs = svg.append("defs").append("clipPath")
+		.attr("id", "clip")
+		.append("rect")
+		.attr("x", margin.left)
+		.attr("width", width - margin.right)
+		.attr("height", height);
+
+    //Show confidence interval
+    var confidence = svg.append("path")
+        .datum(data)
+        .attr("class", "conf")
+        .attr("fill", "#cce5df")
+        .attr("clip-path", "url(#clip)")
+        .attr("stroke", "none")
+        .attr("d", d3.area()
+            .x(function(d) { return x(d.timestamp) })
+            .y0(function(d) { return y(d.senti_avg+d.senti_sd) })
+            .y1(function(d) { return y((d.senti_avg-d.senti_sd)) }));
+    
+	var path = svg.append("path")
+		.datum(data)
+		.attr("class", "path")
+		.attr("fill", "none")
+		.attr("clip-path", "url(#clip)")
+		.attr("stroke", "steelblue")
+		.attr("stroke-width", 1.5)
+		.attr("d", line);
+    
+    
+
+	svg.call(zoom);
+
+	function zoom(svg) {
+
+		var extent = [
+			[margin.left, margin.top], 
+			[width - margin.right, height - margin.top]
+		];
+
+		var zooming = d3.zoom()
+			.scaleExtent([1, 15])
+			.translateExtent(extent)
+			.extent(extent)
+			.on("zoom", zoomed);
+
+		svg.call(zooming);
+
+		function zoomed() {
+
+			x.range([margin.left, width - margin.right]
+				.map(d => d3.event.transform.applyX(d)));
+
+			svg.select(".path")
+				.attr("d", line);
+            
+			svg.select(".conf")
+				.attr("d", d3.area()
+            .x(function(d) { return x(d.timestamp) })
+            .y0(function(d) { return y(d.senti_avg+d.senti_sd) })
+            .y1(function(d) { return y((d.senti_avg-d.senti_sd)) }));
+			svg.select(".x-axis")
+				.call(d3.axisBottom(x)
+					.tickSizeOuter(0));
+		}
+	}
+
+	svg.call(hover)
+
+	function hover() {
+
+		var bisect = d3.bisector(d => d.timestamp).left,
+			format = d3.format("+.0%"),
+			dateFormat = d3.timeFormat("%d.%m.%Y")
+
+		var focus = svg.append("g")
+			.attr("class", "focus")
+			.style("display", "none");
+
+		focus.append("line")
+			.attr("stroke", "#666")
+			.attr("stroke-width", 1)
+			.attr("y1", -height + margin.top)
+			.attr("y2", -margin.bottom);
+
+		focus.append("circle")
+			.attr("class", "circle")
+			.attr("r", 5)
+			.attr("dy", 5)
+			.attr("stroke", "steelblue")
+			.attr("fill", "#fff");
+
+		focus.append("text")
+			.attr("text-anchor", "middle")
+			.attr("dy", ".35em");
+
+		var overlay = svg.append("rect")
+			.attr("class", "overlay")
+			.attr("x", margin.left)
+			.attr("y", margin.top)
+			.attr("width", width - margin.right - margin.left - 1)
+			.attr("height", height - margin.bottom - margin.top)
+			.on("mouseover", () => focus.style("display", null))
+			.on("mouseout", () => focus.style("display", "none"))
+			.on("mousemove", mousemove);
+	
+		function mousemove() {
+
+			var x0 = x.invert(d3.mouse(this)[0]);
+
+			var i = bisect(data, x0, 1),
+				d0 = data[i - 1],
+				d1 = data[i],
+				d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
+
+			focus.select("line")
+				.attr("transform", 
+					"translate(" + x(d.timestamp) + "," + height + ")");
+
+			focus.selectAll(".circle")
+				.attr("transform", 
+					"translate(" + x(d.timestamp) + "," + y(d.senti_avg) + ")");
+
+			focus.select("text")
+				.attr("transform", 
+					"translate(" + x(d.timestamp) + "," + (height + margin.bottom) + ")")
+				.text(dateFormat(d.timestamp) + ' - Avg:' + d.senti_avg.toFixed(2) + ' SD: ' + d.senti_sd.toFixed(3));
+		}
+	}
                   })
                   .catch(err => console.log(err))
 
