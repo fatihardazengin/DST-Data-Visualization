@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="Fatih Arda Zengin ,Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="author" content="Fatih Arda Zengin">
     <meta name="generator" content="Hugo 0.88.1">
-    <title>DST Data VP</title>
+    <title>Turkish Public Sentiment</title>
    <script src="https://d3js.org/d3.v4.min.js"></script>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/sticky-footer-navbar/">
@@ -51,7 +51,7 @@
   <!-- Fixed navbar -->
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">DST Data Visualization</a>
+      <a class="navbar-brand" href="#">Turkish Public Sentiment</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -61,13 +61,7 @@
             <a class="nav-link active" aria-current="page" href="index.html">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="AboutUs/index.html">About Us</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled">Disabled</a>
+            <a class="nav-link" href="AboutUs/index.html">About</a>
           </li>
         </ul>
         
@@ -79,8 +73,8 @@
 <!-- Begin page content -->
 <main class="flex-shrink-0">
   <div class="container">
-    <h1 class="mt-5">DST Data Visualization Project</h1>
-    <p class="lead">This project was created by VarolLab... Pin a footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A fixed navbar has been added with <code class="small">padding-top: 60px;</code> on the <code class="small">main > .container</code>.</p>
+    <h1 class="mt-12">Sentiment of Turkish public tweets</h1>
+    <p class="lead">We computed public sentiment for over 1.5B tweets posted on Twitter. Using Turkish sentiment detection model we created, we can identify societally important events where the sentiment deviates from normal ranges significantly.</p>
     
     <div id="my_dataviz"><svg id="chart" width="800" height="420"></svg>
 </div> 
@@ -97,10 +91,10 @@
 
 
 <footer class="footer mt-auto py-3 bg-light">
-  <div class="container">
-    <span class="text-muted">Powered by <a href="http://www.varollab.com/">VarolLab.</a> </span>
-  </div>
-</footer>
+    <div class="container">
+      <span class="text-muted">Powered by <a href="http://www.varollab.com/">VRL Lab.</a> </span>
+    </div>
+  </footer>
 
 
     <script src="assets/dist/js/bootstrap.bundle.min.js"></script>
