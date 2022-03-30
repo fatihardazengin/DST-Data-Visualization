@@ -23,9 +23,9 @@ fetch("daily_sentiment.json") // fetching the data file.
               
             })
     // set the dimensions and margins of the graph
-    var margin = {top: 10, right: 30, bottom: 30, left: 60},
-        width = window.innerWidth - margin.left - margin.right -((window.innerWidth/100)*17)
-        height = 400 - margin.top - margin.bottom;
+    var margin = {top: 10, right: 60, bottom: 50, left: 60},
+        //width = window.innerWidth - margin.left - margin.right -((window.innerWidth/100)*17)
+        height = 450 - margin.top - margin.bottom;
 
     // find data range
     var xMin = d3.min(data, function(d){ return Math.min(d.timestamp); });
@@ -35,7 +35,7 @@ fetch("daily_sentiment.json") // fetching the data file.
     
 	var svg = d3.select("#chart")
 		margin = margin,
-		width = +svg.attr("width") - margin.left - margin.right,
+		width = +svg.attr("width") - margin.left - margin.right ,
 		height = +svg.attr("height") - margin.top - margin.bottom;
 
 	var x = d3.scaleTime()
@@ -87,7 +87,7 @@ fetch("daily_sentiment.json") // fetching the data file.
 		.attr("fill", "none")
 		.attr("clip-path", "url(#clip)")
 		.attr("stroke", "steelblue")
-		.attr("stroke-width", 1.5)
+		.attr("stroke-width", 1)
 		.attr("d", line);
     
     
@@ -154,7 +154,20 @@ fetch("daily_sentiment.json") // fetching the data file.
 			.attr("fill", "#fff");
 
 		focus.append("text")
-			.attr("text-anchor", "middle")
+            .attr("id","datetxt")
+			.attr("text-anchor", "left")
+			.attr("dy", ".35em");
+        focus.append("text")
+            .attr("id","avgtxt")
+			.attr("text-anchor", "left")
+			.attr("dy", ".35em");
+       focus.append("text")
+            .attr("id","sdtxt")
+			.attr("text-anchor", "left")
+			.attr("dy", ".35em");
+        focus.append("text")
+            .attr("id","wordstxt")
+			.attr("text-anchor", "left")
 			.attr("dy", ".35em");
 
 		var overlay = svg.append("rect")
@@ -184,10 +197,27 @@ fetch("daily_sentiment.json") // fetching the data file.
 				.attr("transform", 
 					"translate(" + x(d.timestamp) + "," + y(d.senti_avg) + ")");
 
-			focus.select("text")
+//			focus.select("text")
+//				.attr("transform", 
+//					"translate(" + x(d.timestamp) + "," + (height  + margin.bottom) + ")")
+//				.text( "Date:"+dateFormat(d.timestamp) + 
+//                      " Avg:" + d.senti_avg.toFixed(2) + '\n\r SD: ' + d.senti_sd.toFixed(3));
+            focus.select("#datetxt")
 				.attr("transform", 
-					"translate(" + x(d.timestamp) + "," + (height + margin.bottom) + ")")
-				.text(dateFormat(d.timestamp) + ' - Avg:' + d.senti_avg.toFixed(2) + ' SD: ' + d.senti_sd.toFixed(3));
+					"translate(" + x(d.timestamp) + "," + (height   - 20 ) + ")")
+				.text( "Date:"+dateFormat(d.timestamp));
+            focus.select("#avgtxt")
+				.attr("transform", 
+					"translate(" + x(d.timestamp) + "," + (height    ) + ")")
+				.text( "Avg:" + d.senti_avg.toFixed(2));
+            focus.select("#sdtxt")
+				.attr("transform", 
+					"translate(" + x(d.timestamp) + "," + (height   + 20 ) + ")")
+				.text('SD: ' + d.senti_sd.toFixed(3));
+            focus.select("#wordstxt")
+				.attr("transform", 
+					"translate(" + x(d.timestamp) + "," + (height   + 40 ) + ")")
+				.text('Most Common Words: ' );
 		}
 	}
                   })
